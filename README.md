@@ -6,7 +6,14 @@
 
 ### Storytelling técnico
 
-Em bases judiciais, o valor raramente está apenas no processo isolado. Muitas decisões dependem do contexto relacional: partes recorrentes, advogados em comum, temas repetidos, fase processual e histórico de comportamento semelhante. É justamente aí que modelagem em grafo faz sentido.
+Em bases judiciais, o valor raramente está apenas no processo isolado. Quando um analista avalia um caso para possível acordo, ele normalmente quer saber mais do que o texto do processo atual. Ele quer entender:
+
+- se as partes aparecem de forma recorrente;
+- se o mesmo advogado ou escritório já esteve envolvido em casos semelhantes;
+- se o tribunal ou o juiz aparecem em padrões parecidos;
+- se existem outros processos relacionados que terminaram em acordo ou seguiram até decisão.
+
+Esse tipo de pergunta é difícil de responder quando os dados estão espalhados em tabelas independentes. É justamente nesse ponto que a modelagem em grafo faz sentido: ela transforma relações dispersas em estrutura navegável e mensurável.
 
 Este projeto foi desenhado com essa lógica:
 
@@ -26,6 +33,25 @@ O projeto foi estruturado para mostrar como um problema jurídico pode ser reesc
 - suporte à decisão para análise de acordo.
 
 Em outras palavras, a proposta aqui não é “o modelo decide o acordo”, mas sim “o grafo melhora o contexto disponível para a avaliação do acordo”.
+
+### Explicação dos principais termos
+
+- `docket`
+  no contexto do CourtListener, é o registro principal do caso judicial, equivalente ao processo ou ao conjunto de movimentações de uma ação.
+- `party`
+  representa uma parte do caso, como autor, réu, requerente ou requerido.
+- `attorney`
+  representa o advogado ou escritório ligado a uma parte.
+- `judge`
+  representa o magistrado associado ao caso.
+- `heterogeneous graph`
+  é um grafo com mais de um tipo de nó e mais de um tipo de relação.
+- `linkage`
+  aqui significa identificar conexões relevantes entre casos e entidades, mesmo quando elas não estão explícitas em uma única tabela.
+- `enrichment`
+  significa adicionar contexto ao caso atual a partir da estrutura relacional do grafo.
+- `settlement support`
+  significa gerar sinais de apoio à análise de acordo, sem substituir a decisão humana.
 
 ### Arquitetura do projeto
 
@@ -55,6 +81,12 @@ Isso permite representar, por exemplo:
 - attorneys que conectam grupos de casos;
 - judges compartilhados entre dockets;
 - dockets que compartilham contexto relacional mesmo sem texto idêntico.
+
+### Por que o CourtListener foi escolhido como referência
+
+O `CourtListener` é uma referência pública muito conhecida em dados jurídicos porque expõe objetos reais do ecossistema judicial, como `dockets`, `parties`, `attorneys` e `opinions`. Mesmo usando um sample dataset local, a escolha desse schema ajuda a deixar o projeto mais próximo de um cenário real do que uma base jurídica genérica.
+
+Isso também melhora o valor do portfólio, porque mostra não só a ideia de grafo, mas uma modelagem inspirada em uma estrutura jurídica pública e reconhecida.
 
 ### Papel técnico de cada arquivo
 
@@ -93,6 +125,23 @@ O projeto usa um runtime `GNN-ready`, mas validado localmente por um fallback ba
 
 Esses sinais alimentam um benchmark supervisionado para estimar propensão de acordo e apoiar recomendação operacional.
 
+Em termos práticos:
+
+- `party_degree`
+  mede quantas partes estão conectadas ao docket;
+- `attorney_degree`
+  mede quantos advogados aparecem no entorno daquele caso;
+- `judge_degree`
+  mede a presença relacional do magistrado na estrutura analisada;
+- `related_docket_links`
+  mede quantos outros dockets estão conectados por entidades compartilhadas;
+- `repeat_player_signal`
+  representa presença de parte recorrente, algo muito relevante em litígios massificados;
+- `negative_precedent_signal`
+  representa um sinal simplificado de contexto desfavorável ao réu;
+- `nature_*` e `court_*`
+  codificam natureza da ação e tribunal, preservando contexto jurídico mínimo.
+
 Quando a stack completa de `torch-geometric` estiver disponível, essa base pode evoluir naturalmente para arquiteturas como:
 
 - `GCN`
@@ -115,11 +164,25 @@ Quando a stack completa de `torch-geometric` estiver disponível, essa base pode
 
 No benchmark atual:
 
-- todos os processos estão em algum grupo relacional enriquecido;
+- todos os dockets estão em algum grupo relacional enriquecido;
 - o classificador local conseguiu distinguir parte relevante dos casos conciliáveis;
 - a saída final não é apresentada como decisão automática, e sim como camada de apoio à análise.
 
 Esse posicionamento é importante em contexto jurídico, porque o valor do sistema está em estruturar contexto e priorizar revisão, não em substituir o julgamento humano.
+
+### Como isso poderia evoluir para uma GNN real
+
+Hoje o projeto usa um fallback supervisionado sobre features derivadas do grafo, porque esse caminho é mais leve e reproduzível no ambiente local. Mas a modelagem já foi preparada com mentalidade `GNN-ready`.
+
+Os próximos passos naturais seriam:
+
+- transformar nós e arestas em tensores de grafo;
+- usar `GCN`, `GraphSAGE` ou `GAT`;
+- aprender embeddings dos dockets a partir da vizinhança;
+- usar esses embeddings para:
+  - classificação de propensão de acordo;
+  - recuperação de casos semelhantes;
+  - previsão de links entre entidades e casos.
 
 ### Artefatos gerados
 
@@ -172,6 +235,25 @@ The repository is designed to show how judicial data can be restructured as a gr
 - settlement support analysis.
 
 The goal is not to automate legal judgment, but to improve the quality of contextual signals available for settlement evaluation.
+
+### Technical vocabulary
+
+- `docket`
+  the primary court case record in CourtListener-style data.
+- `party`
+  a plaintiff, defendant, petitioner, respondent, or other case participant.
+- `attorney`
+  a lawyer or law office connected to a party.
+- `judge`
+  the judicial actor assigned to a case.
+- `heterogeneous graph`
+  a graph with multiple node types and multiple edge types.
+- `linkage`
+  the task of identifying meaningful relationships across cases and entities.
+- `enrichment`
+  the task of adding relational context to a case through graph structure.
+- `settlement support`
+  decision support signals for settlement analysis, not automated legal judgment.
 
 ### Current results
 
