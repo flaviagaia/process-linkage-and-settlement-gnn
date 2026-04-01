@@ -11,24 +11,27 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split
 
-from src.sample_data import ensure_graph_dataset
+from src.sample_data import ensure_courtlistener_sample_dataset
 
 
 def _build_graph(base_dir: Path) -> tuple[nx.Graph, pd.DataFrame]:
-    dataset = ensure_graph_dataset(base_dir)
-    process_df = pd.read_csv(dataset["process_path"])
+    dataset = ensure_courtlistener_sample_dataset(base_dir)
+    process_df = pd.read_csv(dataset["dockets_path"])
     parties_df = pd.read_csv(dataset["parties_path"])
-    lawyers_df = pd.read_csv(dataset["lawyers_path"])
+    lawyers_df = pd.read_csv(dataset["attorneys_path"])
+    judges_df = pd.read_csv(dataset["judges_path"])
     edges_df = pd.read_csv(dataset["edges_path"])
 
     graph = nx.Graph()
 
     for _, row in process_df.iterrows():
-        graph.add_node(row["process_id"], node_type="process", **row.to_dict())
+        graph.add_node(row["docket_id"], node_type="docket", **row.to_dict())
     for _, row in parties_df.iterrows():
         graph.add_node(row["party_id"], node_type="party", **row.to_dict())
     for _, row in lawyers_df.iterrows():
-        graph.add_node(row["lawyer_id"], node_type="lawyer", **row.to_dict())
+        graph.add_node(row["attorney_id"], node_type="attorney", **row.to_dict())
+    for _, row in judges_df.iterrows():
+        graph.add_node(row["judge_id"], node_type="judge", **row.to_dict())
     for _, row in edges_df.iterrows():
         graph.add_edge(row["source_id"], row["target_id"], edge_type=row["edge_type"])
 
@@ -38,37 +41,39 @@ def _build_graph(base_dir: Path) -> tuple[nx.Graph, pd.DataFrame]:
 def _extract_process_features(graph: nx.Graph, process_df: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for _, row in process_df.iterrows():
-        process_id = row["process_id"]
+        process_id = row["docket_id"]
         neighbors = list(graph.neighbors(process_id))
         party_neighbors = [n for n in neighbors if graph.nodes[n].get("node_type") == "party"]
-        lawyer_neighbors = []
+        attorney_neighbors = []
+        judge_neighbors = [n for n in neighbors if graph.nodes[n].get("node_type") == "judge"]
         for party_id in party_neighbors:
-            lawyer_neighbors.extend(
-                neigh for neigh in graph.neighbors(party_id) if graph.nodes[neigh].get("node_type") == "lawyer"
+            attorney_neighbors.extend(
+                neigh for neigh in graph.neighbors(party_id) if graph.nodes[neigh].get("node_type") == "attorney"
             )
         recurring_process_links = 0
         for party_id in party_neighbors:
             recurring_process_links += sum(
                 1
                 for neigh in graph.neighbors(party_id)
-                if neigh != process_id and graph.nodes[neigh].get("node_type") == "process"
+                if neigh != process_id and graph.nodes[neigh].get("node_type") == "docket"
             )
 
         rows.append(
             {
-                "process_id": process_id,
+                "docket_id": process_id,
                 "claim_value": float(row["claim_value"]),
-                "recurring_party": int(row["recurring_party"]),
-                "negative_precedent": int(row["negative_precedent"]),
+                "repeat_player_signal": int(row["repeat_player_signal"]),
+                "negative_precedent_signal": int(row["negative_precedent_signal"]),
                 "party_degree": int(len(party_neighbors)),
-                "lawyer_degree": int(len(set(lawyer_neighbors))),
-                "related_process_links": int(recurring_process_links),
-                "theme_bancario": int(row["theme"] == "bancario"),
-                "theme_consumidor": int(row["theme"] == "consumidor"),
-                "theme_saude": int(row["theme"] == "saude"),
-                "phase_conhecimento": int(row["phase"] == "conhecimento"),
-                "phase_instrucao": int(row["phase"] == "instrucao"),
-                "phase_recursal": int(row["phase"] == "recursal"),
+                "attorney_degree": int(len(set(attorney_neighbors))),
+                "judge_degree": int(len(set(judge_neighbors))),
+                "related_docket_links": int(recurring_process_links),
+                "nature_credit": int(row["nature_of_suit"] == "consumer_credit"),
+                "nature_goods": int(row["nature_of_suit"] == "consumer_goods"),
+                "nature_healthcare": int(row["nature_of_suit"] == "healthcare"),
+                "court_sdny": int(row["court"] == "S.D.N.Y."),
+                "court_ndcal": int(row["court"] == "N.D. Cal."),
+                "court_dmass": int(row["court"] == "D. Mass."),
                 "settled": int(row["settled"]),
             }
         )
@@ -88,11 +93,11 @@ def run_pipeline(base_dir: str | Path) -> dict:
     graph, process_df = _build_graph(base_path)
     features_df = _extract_process_features(graph, process_df)
 
-    X = features_df.drop(columns=["process_id", "settled"])
+    X = features_df.drop(columns=["docket_id", "settled"])
     y = features_df["settled"]
 
     X_train, X_test, y_train, y_test, _train_ids, test_ids = train_test_split(
-        X, y, features_df["process_id"], test_size=0.33, random_state=42, stratify=y
+        X, y, features_df["docket_id"], test_size=0.33, random_state=42, stratify=y
     )
 
     runtime_mode = "graph_feature_fallback"
@@ -115,10 +120,10 @@ def run_pipeline(base_dir: str | Path) -> dict:
 
     decisions = []
     for process_id, probability in zip(test_ids, predicted_probabilities, strict=False):
-        claim_value = float(features_df.loc[features_df["process_id"] == process_id, "claim_value"].iloc[0])
+        claim_value = float(features_df.loc[features_df["docket_id"] == process_id, "claim_value"].iloc[0])
         decisions.append(
             {
-                "process_id": process_id,
+                "docket_id": process_id,
                 "settlement_probability": round(float(probability), 4),
                 "recommendation": _recommend_settlement_band(float(probability), claim_value),
             }
@@ -140,10 +145,11 @@ def run_pipeline(base_dir: str | Path) -> dict:
 
     summary = {
         "runtime_mode": runtime_mode,
+        "dataset_source": "courtlistener_style_sample",
         "node_count": int(graph.number_of_nodes()),
         "edge_count": int(graph.number_of_edges()),
-        "process_count": int(len(process_df)),
-        "linked_process_groups": int(features_df["related_process_links"].gt(0).sum()),
+        "docket_count": int(len(process_df)),
+        "linked_docket_groups": int(features_df["related_docket_links"].gt(0).sum()),
         "accuracy": round(float(accuracy), 4),
         "macro_f1": round(float(macro_f1), 4),
         "roc_auc": round(float(roc_auc), 4),

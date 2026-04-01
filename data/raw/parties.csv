@@ -1,7 +1,8 @@
 party_id,party_role,party_name
-PARTE-1001,autor,joao_silva
-PARTE-1002,autor,maria_souza
-PARTE-1003,reu,banco_alfa
-PARTE-1004,reu,varejo_beta
-PARTE-1005,reu,seguradora_gama
-PARTE-1006,autor,lucas_ferreira
+PTY-1001,Plaintiff,joao_silva
+PTY-1002,Plaintiff,maria_souza
+PTY-1003,Defendant,banco_alfa
+PTY-1004,Defendant,varejo_beta
+PTY-1005,Defendant,seguradora_gama
+PTY-1006,Plaintiff,lucas_ferreira
+PTY-1007,Plaintiff,carla_mendes

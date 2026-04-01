@@ -1,0 +1,11 @@
+docket_id,nature_of_suit,court,slug,claim_value,repeat_player_signal,negative_precedent_signal,settled
+DKT-1001,consumer_credit,S.D.N.Y.,banco_alfa_v_joao,4200,1,1,0
+DKT-1002,consumer_credit,S.D.N.Y.,banco_alfa_v_joao_2,4500,1,1,1
+DKT-1003,consumer_goods,N.D. Cal.,varejo_beta_v_maria,1800,0,0,1
+DKT-1004,consumer_goods,N.D. Cal.,varejo_beta_v_maria_2,2100,0,0,1
+DKT-1005,healthcare,D. Mass.,seguradora_gama_v_carla,12000,1,0,0
+DKT-1006,healthcare,D. Mass.,seguradora_gama_v_maria,9800,1,0,0
+DKT-1007,consumer_credit,S.D.N.Y.,banco_alfa_v_lucas,3900,1,1,1
+DKT-1008,consumer_goods,N.D. Cal.,varejo_beta_v_lucas,1600,0,0,1
+DKT-1009,healthcare,D. Mass.,seguradora_gama_v_carla_2,14000,1,1,0
+DKT-1010,consumer_credit,S.D.N.Y.,banco_alfa_v_joao_appeal,7000,1,1,0

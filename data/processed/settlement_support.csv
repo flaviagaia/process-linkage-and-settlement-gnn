@@ -1,5 +1,5 @@
-process_id,settlement_probability,recommendation
-PROC-1001,0.5111,moderate_settlement_signal | suggested_band=1764.0
-PROC-1009,0.0667,weak_settlement_signal | escalate_to_legal_review
-PROC-1002,0.5056,moderate_settlement_signal | suggested_band=1890.0
-PROC-1008,0.6667,strong_settlement_signal | suggested_band=880.0
+docket_id,settlement_probability,recommendation
+DKT-1001,0.6056,moderate_settlement_signal | suggested_band=1764.0
+DKT-1009,0.0611,weak_settlement_signal | escalate_to_legal_review
+DKT-1002,0.5944,moderate_settlement_signal | suggested_band=1890.0
+DKT-1008,0.9,strong_settlement_signal | suggested_band=880.0

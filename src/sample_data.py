@@ -6,59 +6,79 @@ from tempfile import NamedTemporaryFile
 import pandas as pd
 
 
-PROCESSES = [
-    ("PROC-1001", "bancario", "conhecimento", 4200, 1, 1, 0),
-    ("PROC-1002", "bancario", "conhecimento", 4500, 1, 1, 1),
-    ("PROC-1003", "consumidor", "instrucao", 1800, 0, 0, 1),
-    ("PROC-1004", "consumidor", "instrucao", 2100, 0, 0, 1),
-    ("PROC-1005", "saude", "recursal", 12000, 1, 0, 0),
-    ("PROC-1006", "saude", "conhecimento", 9800, 1, 0, 0),
-    ("PROC-1007", "bancario", "instrucao", 3900, 1, 1, 1),
-    ("PROC-1008", "consumidor", "conhecimento", 1600, 0, 0, 1),
-    ("PROC-1009", "saude", "recursal", 14000, 1, 1, 0),
-    ("PROC-1010", "bancario", "recursal", 7000, 1, 1, 0),
+DOCKETS = [
+    ("DKT-1001", "consumer_credit", "S.D.N.Y.", "banco_alfa_v_joao", 4200, 1, 1, 0),
+    ("DKT-1002", "consumer_credit", "S.D.N.Y.", "banco_alfa_v_joao_2", 4500, 1, 1, 1),
+    ("DKT-1003", "consumer_goods", "N.D. Cal.", "varejo_beta_v_maria", 1800, 0, 0, 1),
+    ("DKT-1004", "consumer_goods", "N.D. Cal.", "varejo_beta_v_maria_2", 2100, 0, 0, 1),
+    ("DKT-1005", "healthcare", "D. Mass.", "seguradora_gama_v_carla", 12000, 1, 0, 0),
+    ("DKT-1006", "healthcare", "D. Mass.", "seguradora_gama_v_maria", 9800, 1, 0, 0),
+    ("DKT-1007", "consumer_credit", "S.D.N.Y.", "banco_alfa_v_lucas", 3900, 1, 1, 1),
+    ("DKT-1008", "consumer_goods", "N.D. Cal.", "varejo_beta_v_lucas", 1600, 0, 0, 1),
+    ("DKT-1009", "healthcare", "D. Mass.", "seguradora_gama_v_carla_2", 14000, 1, 1, 0),
+    ("DKT-1010", "consumer_credit", "S.D.N.Y.", "banco_alfa_v_joao_appeal", 7000, 1, 1, 0),
 ]
 
 PARTIES = [
-    ("PARTE-1001", "autor", "joao_silva"),
-    ("PARTE-1002", "autor", "maria_souza"),
-    ("PARTE-1003", "reu", "banco_alfa"),
-    ("PARTE-1004", "reu", "varejo_beta"),
-    ("PARTE-1005", "reu", "seguradora_gama"),
-    ("PARTE-1006", "autor", "lucas_ferreira"),
+    ("PTY-1001", "Plaintiff", "joao_silva"),
+    ("PTY-1002", "Plaintiff", "maria_souza"),
+    ("PTY-1003", "Defendant", "banco_alfa"),
+    ("PTY-1004", "Defendant", "varejo_beta"),
+    ("PTY-1005", "Defendant", "seguradora_gama"),
+    ("PTY-1006", "Plaintiff", "lucas_ferreira"),
+    ("PTY-1007", "Plaintiff", "carla_mendes"),
 ]
 
-LAWYERS = [
-    ("ADV-1001", "escritorio_justica"),
-    ("ADV-1002", "advocacia_cidada"),
-    ("ADV-1003", "contencioso_alfa"),
+ATTORNEYS = [
+    ("ATTY-1001", "escritorio_justica"),
+    ("ATTY-1002", "advocacia_cidada"),
+    ("ATTY-1003", "contencioso_alfa"),
+]
+
+JUDGES = [
+    ("JDG-1001", "judge_hamilton"),
+    ("JDG-1002", "judge_reyes"),
+    ("JDG-1003", "judge_bennett"),
 ]
 
 EDGES = [
-    ("PARTE-1001", "PROC-1001", "parte_em"),
-    ("PARTE-1001", "PROC-1002", "parte_em"),
-    ("PARTE-1002", "PROC-1003", "parte_em"),
-    ("PARTE-1002", "PROC-1004", "parte_em"),
-    ("PARTE-1002", "PROC-1006", "parte_em"),
-    ("PARTE-1006", "PROC-1007", "parte_em"),
-    ("PARTE-1006", "PROC-1008", "parte_em"),
-    ("PARTE-1001", "PROC-1010", "parte_em"),
-    ("PARTE-1003", "PROC-1001", "parte_em"),
-    ("PARTE-1003", "PROC-1002", "parte_em"),
-    ("PARTE-1003", "PROC-1007", "parte_em"),
-    ("PARTE-1003", "PROC-1010", "parte_em"),
-    ("PARTE-1004", "PROC-1003", "parte_em"),
-    ("PARTE-1004", "PROC-1004", "parte_em"),
-    ("PARTE-1004", "PROC-1008", "parte_em"),
-    ("PARTE-1005", "PROC-1005", "parte_em"),
-    ("PARTE-1005", "PROC-1006", "parte_em"),
-    ("PARTE-1005", "PROC-1009", "parte_em"),
-    ("ADV-1001", "PARTE-1001", "representa"),
-    ("ADV-1001", "PARTE-1002", "representa"),
-    ("ADV-1001", "PARTE-1006", "representa"),
-    ("ADV-1002", "PARTE-1003", "representa"),
-    ("ADV-1002", "PARTE-1004", "representa"),
-    ("ADV-1003", "PARTE-1005", "representa"),
+    ("PTY-1001", "DKT-1001", "party_in_docket"),
+    ("PTY-1001", "DKT-1002", "party_in_docket"),
+    ("PTY-1001", "DKT-1010", "party_in_docket"),
+    ("PTY-1002", "DKT-1003", "party_in_docket"),
+    ("PTY-1002", "DKT-1004", "party_in_docket"),
+    ("PTY-1002", "DKT-1006", "party_in_docket"),
+    ("PTY-1003", "DKT-1001", "party_in_docket"),
+    ("PTY-1003", "DKT-1002", "party_in_docket"),
+    ("PTY-1003", "DKT-1007", "party_in_docket"),
+    ("PTY-1003", "DKT-1010", "party_in_docket"),
+    ("PTY-1004", "DKT-1003", "party_in_docket"),
+    ("PTY-1004", "DKT-1004", "party_in_docket"),
+    ("PTY-1004", "DKT-1008", "party_in_docket"),
+    ("PTY-1005", "DKT-1005", "party_in_docket"),
+    ("PTY-1005", "DKT-1006", "party_in_docket"),
+    ("PTY-1005", "DKT-1009", "party_in_docket"),
+    ("PTY-1006", "DKT-1007", "party_in_docket"),
+    ("PTY-1006", "DKT-1008", "party_in_docket"),
+    ("PTY-1007", "DKT-1005", "party_in_docket"),
+    ("PTY-1007", "DKT-1009", "party_in_docket"),
+    ("ATTY-1001", "PTY-1001", "represents"),
+    ("ATTY-1001", "PTY-1002", "represents"),
+    ("ATTY-1001", "PTY-1006", "represents"),
+    ("ATTY-1001", "PTY-1007", "represents"),
+    ("ATTY-1002", "PTY-1003", "represents"),
+    ("ATTY-1002", "PTY-1004", "represents"),
+    ("ATTY-1003", "PTY-1005", "represents"),
+    ("JDG-1001", "DKT-1001", "assigned_to"),
+    ("JDG-1001", "DKT-1002", "assigned_to"),
+    ("JDG-1001", "DKT-1007", "assigned_to"),
+    ("JDG-1001", "DKT-1010", "assigned_to"),
+    ("JDG-1002", "DKT-1003", "assigned_to"),
+    ("JDG-1002", "DKT-1004", "assigned_to"),
+    ("JDG-1002", "DKT-1008", "assigned_to"),
+    ("JDG-1003", "DKT-1005", "assigned_to"),
+    ("JDG-1003", "DKT-1006", "assigned_to"),
+    ("JDG-1003", "DKT-1009", "assigned_to"),
 ]
 
 
@@ -74,40 +94,45 @@ def _atomic_write(df: pd.DataFrame, path: Path) -> None:
             temp_path.unlink()
 
 
-def ensure_graph_dataset(base_dir: str | Path) -> dict[str, str]:
+def ensure_courtlistener_sample_dataset(base_dir: str | Path) -> dict[str, str]:
     base_path = Path(base_dir)
     raw_dir = base_path / "data" / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
 
-    process_path = raw_dir / "processes.csv"
+    dockets_path = raw_dir / "dockets.csv"
     parties_path = raw_dir / "parties.csv"
-    lawyers_path = raw_dir / "lawyers.csv"
+    attorneys_path = raw_dir / "attorneys.csv"
+    judges_path = raw_dir / "judges.csv"
     edges_path = raw_dir / "edges.csv"
 
-    process_df = pd.DataFrame(
-        PROCESSES,
+    dockets_df = pd.DataFrame(
+        DOCKETS,
         columns=[
-            "process_id",
-            "theme",
-            "phase",
+            "docket_id",
+            "nature_of_suit",
+            "court",
+            "slug",
             "claim_value",
-            "recurring_party",
-            "negative_precedent",
+            "repeat_player_signal",
+            "negative_precedent_signal",
             "settled",
         ],
     )
     parties_df = pd.DataFrame(PARTIES, columns=["party_id", "party_role", "party_name"])
-    lawyers_df = pd.DataFrame(LAWYERS, columns=["lawyer_id", "office_name"])
+    attorneys_df = pd.DataFrame(ATTORNEYS, columns=["attorney_id", "office_name"])
+    judges_df = pd.DataFrame(JUDGES, columns=["judge_id", "judge_name"])
     edges_df = pd.DataFrame(EDGES, columns=["source_id", "target_id", "edge_type"])
 
-    _atomic_write(process_df, process_path)
+    _atomic_write(dockets_df, dockets_path)
     _atomic_write(parties_df, parties_path)
-    _atomic_write(lawyers_df, lawyers_path)
+    _atomic_write(attorneys_df, attorneys_path)
+    _atomic_write(judges_df, judges_path)
     _atomic_write(edges_df, edges_path)
 
     return {
-        "process_path": str(process_path),
+        "dockets_path": str(dockets_path),
         "parties_path": str(parties_path),
-        "lawyers_path": str(lawyers_path),
+        "attorneys_path": str(attorneys_path),
+        "judges_path": str(judges_path),
         "edges_path": str(edges_path),
     }

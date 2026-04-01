@@ -2,7 +2,7 @@
 
 ## Português
 
-`process-linkage-and-settlement-gnn` é um projeto de ligação e enriquecimento de bases de processos judiciais com mentalidade de `Graph Neural Networks`, voltado a suporte de decisão para análise de acordos.
+`process-linkage-and-settlement-gnn` é um projeto de ligação e enriquecimento de bases judiciais com mentalidade de `Graph Neural Networks`, agora estruturado sobre um sample dataset no estilo **CourtListener**, voltado a suporte de decisão para análise de acordos.
 
 ### Storytelling técnico
 
@@ -10,9 +10,9 @@ Em bases judiciais, o valor raramente está apenas no processo isolado. Muitas d
 
 Este projeto foi desenhado com essa lógica:
 
-- materializa uma base sintética de processos, partes, advogados e relações;
-- monta um grafo heterogêneo;
-- extrai sinais estruturais por processo;
+- materializa um sample dataset inspirado nos objetos públicos do `CourtListener`;
+- monta um grafo heterogêneo com `dockets`, `parties`, `attorneys` e `judges`;
+- extrai sinais estruturais por `docket`;
 - gera suporte à decisão para acordo judicial;
 - mantém um runtime local reproduzível mesmo quando a stack completa de `GNN` não está disponível.
 
@@ -36,27 +36,30 @@ Em outras palavras, a proposta aqui não é “o modelo decide o acordo”, mas 
 
 ### Estrutura do grafo
 
-O dataset sintético materializa três tipos principais de nós:
+O sample dataset materializa quatro tipos principais de nós:
 
-- `process`
+- `docket`
 - `party`
-- `lawyer`
+- `attorney`
+- `judge`
 
 e relações como:
 
-- `parte_em`
-- `representa`
+- `party_in_docket`
+- `represents`
+- `assigned_to`
 
 Isso permite representar, por exemplo:
 
-- partes que aparecem em múltiplos processos;
-- advogados que conectam grupos de casos;
-- processos que compartilham contexto relacional mesmo sem texto idêntico.
+- partes que aparecem em múltiplos dockets;
+- attorneys que conectam grupos de casos;
+- judges compartilhados entre dockets;
+- dockets que compartilham contexto relacional mesmo sem texto idêntico.
 
 ### Papel técnico de cada arquivo
 
 - [src/sample_data.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/src/sample_data.py)
-  materializa a base sintética de nós e arestas com escrita atômica.
+  materializa um sample dataset no estilo `CourtListener` com escrita atômica.
 - [src/modeling.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/src/modeling.py)
   constrói o grafo, extrai sinais estruturais por processo, executa o benchmark local e gera recomendações de suporte a acordo.
 - [main.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/main.py)
@@ -77,15 +80,16 @@ flowchart LR
 
 ### Estratégia de modelagem
 
-O projeto usa um runtime `GNN-ready`, mas validado localmente por um fallback baseado em features de grafo. Para cada processo, o pipeline extrai sinais como:
+O projeto usa um runtime `GNN-ready`, mas validado localmente por um fallback baseado em features de grafo. Para cada `docket`, o pipeline extrai sinais como:
 
 - `party_degree`
-- `lawyer_degree`
-- `related_process_links`
-- `recurring_party`
-- `negative_precedent`
-- `theme_*`
-- `phase_*`
+- `attorney_degree`
+- `judge_degree`
+- `related_docket_links`
+- `repeat_player_signal`
+- `negative_precedent_signal`
+- `nature_*`
+- `court_*`
 
 Esses sinais alimentam um benchmark supervisionado para estimar propensão de acordo e apoiar recomendação operacional.
 
@@ -98,10 +102,11 @@ Quando a stack completa de `torch-geometric` estiver disponível, essa base pode
 ### Resultados atuais
 
 - `runtime_mode = graph_feature_fallback`
+- `dataset_source = courtlistener_style_sample`
 - `node_count = 19`
-- `edge_count = 24`
-- `process_count = 10`
-- `linked_process_groups = 10`
+- `edge_count = 37`
+- `docket_count = 10`
+- `linked_docket_groups = 10`
 - `accuracy = 0.7500`
 - `macro_f1 = 0.7333`
 - `roc_auc = 0.7500`
@@ -126,16 +131,25 @@ Esse posicionamento é importante em contexto jurídico, porque o valor do siste
   [data/processed/process_linkage_settlement_report.json](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/processed/process_linkage_settlement_report.json)
 - modelo persistido:
   [artifacts/graph_settlement_model.joblib](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/artifacts/graph_settlement_model.joblib)
+- dockets no estilo CourtListener:
+  [data/raw/dockets.csv](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/raw/dockets.csv)
+- parties:
+  [data/raw/parties.csv](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/raw/parties.csv)
+- attorneys:
+  [data/raw/attorneys.csv](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/raw/attorneys.csv)
+- judges:
+  [data/raw/judges.csv](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/raw/judges.csv)
 
 ### Contrato do relatório final
 
 O relatório consolidado registra:
 
 - `runtime_mode`
+- `dataset_source`
 - `node_count`
 - `edge_count`
-- `process_count`
-- `linked_process_groups`
+- `docket_count`
+- `linked_docket_groups`
 - `accuracy`
 - `macro_f1`
 - `roc_auc`
@@ -146,7 +160,7 @@ O relatório consolidado registra:
 
 ## English
 
-`process-linkage-and-settlement-gnn` is a judicial process linkage and enrichment project with a `Graph Neural Networks` mindset, designed to support settlement evaluation with graph-based context.
+`process-linkage-and-settlement-gnn` is a judicial data linkage and enrichment project with a `Graph Neural Networks` mindset, now structured around a **CourtListener-style** sample dataset to support settlement evaluation with graph-based context.
 
 ### Architectural intent
 
@@ -162,10 +176,11 @@ The goal is not to automate legal judgment, but to improve the quality of contex
 ### Current results
 
 - `runtime_mode = graph_feature_fallback`
+- `dataset_source = courtlistener_style_sample`
 - `node_count = 19`
-- `edge_count = 24`
-- `process_count = 10`
-- `linked_process_groups = 10`
+- `edge_count = 37`
+- `docket_count = 10`
+- `linked_docket_groups = 10`
 - `accuracy = 0.7500`
 - `macro_f1 = 0.7333`
 - `roc_auc = 0.7500`
