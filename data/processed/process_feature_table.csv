@@ -1,0 +1,11 @@
+process_id,claim_value,recurring_party,negative_precedent,party_degree,lawyer_degree,related_process_links,theme_bancario,theme_consumidor,theme_saude,phase_conhecimento,phase_instrucao,phase_recursal,settled
+PROC-1001,4200.0,1,1,2,2,5,1,0,0,1,0,0,0
+PROC-1002,4500.0,1,1,2,2,5,1,0,0,1,0,0,1
+PROC-1003,1800.0,0,0,2,2,4,0,1,0,0,1,0,1
+PROC-1004,2100.0,0,0,2,2,4,0,1,0,0,1,0,1
+PROC-1005,12000.0,1,0,1,1,2,0,0,1,0,0,1,0
+PROC-1006,9800.0,1,0,2,2,4,0,0,1,1,0,0,0
+PROC-1007,3900.0,1,1,2,2,4,1,0,0,0,1,0,1
+PROC-1008,1600.0,0,0,2,2,3,0,1,0,1,0,0,1
+PROC-1009,14000.0,1,1,1,1,2,0,0,1,0,0,1,0
+PROC-1010,7000.0,1,1,2,2,5,1,0,0,0,0,1,0
