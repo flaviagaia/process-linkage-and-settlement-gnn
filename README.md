@@ -4,24 +4,6 @@
 
 `process-linkage-and-settlement-gnn` é um projeto de ligação e enriquecimento de bases judiciais com mentalidade de `Graph Neural Networks`, agora estruturado sobre um sample dataset no estilo **CourtListener**, voltado a suporte de decisão para análise de acordos.
 
-### Storytelling técnico
-
-Em bases judiciais, o valor raramente está apenas no processo isolado. Quando um analista avalia um caso para possível acordo, ele normalmente quer saber mais do que o texto do processo atual. Ele quer entender:
-
-- se as partes aparecem de forma recorrente;
-- se o mesmo advogado ou escritório já esteve envolvido em casos semelhantes;
-- se o tribunal ou o juiz aparecem em padrões parecidos;
-- se existem outros processos relacionados que terminaram em acordo ou seguiram até decisão.
-
-Esse tipo de pergunta é difícil de responder quando os dados estão espalhados em tabelas independentes. É justamente nesse ponto que a modelagem em grafo faz sentido: ela transforma relações dispersas em estrutura navegável e mensurável.
-
-Este projeto foi desenhado com essa lógica:
-
-- materializa um sample dataset inspirado nos objetos públicos do `CourtListener`;
-- monta um grafo heterogêneo com `dockets`, `parties`, `attorneys` e `judges`;
-- extrai sinais estruturais por `docket`;
-- gera suporte à decisão para acordo judicial;
-- mantém um runtime local reproduzível mesmo quando a stack completa de `GNN` não está disponível.
 
 ### Objetivo arquitetural
 
@@ -55,10 +37,10 @@ Em outras palavras, a proposta aqui não é “o modelo decide o acordo”, mas 
 
 ### Arquitetura do projeto
 
-- [src/sample_data.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/src/sample_data.py)
-- [src/modeling.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/src/modeling.py)
-- [main.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/main.py)
-- [tests/test_project.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/tests/test_project.py)
+- [src/sample_data.py](src/sample_data.py)
+- [src/modeling.py](src/modeling.py)
+- [main.py](main.py)
+- [tests/test_project.py](tests/test_project.py)
 
 ### Estrutura do grafo
 
@@ -90,13 +72,13 @@ Isso também melhora o valor do portfólio, porque mostra não só a ideia de gr
 
 ### Papel técnico de cada arquivo
 
-- [src/sample_data.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/src/sample_data.py)
+- [src/sample_data.py](src/sample_data.py)
   materializa um sample dataset no estilo `CourtListener` com escrita atômica.
-- [src/modeling.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/src/modeling.py)
+- [src/modeling.py](src/modeling.py)
   constrói o grafo, extrai sinais estruturais por processo, executa o benchmark local e gera recomendações de suporte a acordo.
-- [main.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/main.py)
+- [main.py](main.py)
   executa o pipeline completo e imprime o sumário consolidado.
-- [tests/test_project.py](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/tests/test_project.py)
+- [tests/test_project.py](tests/test_project.py)
   valida o contrato mínimo do pipeline e a consistência das métricas.
 
 ### Pipeline
@@ -187,21 +169,21 @@ Os próximos passos naturais seriam:
 ### Artefatos gerados
 
 - tabela enriquecida por processo:
-  [data/processed/process_feature_table.csv](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/processed/process_feature_table.csv)
+  [data/processed/process_feature_table.csv](data/processed/process_feature_table.csv)
 - suporte à decisão de acordo:
-  [data/processed/settlement_support.csv](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/processed/settlement_support.csv)
+  [data/processed/settlement_support.csv](data/processed/settlement_support.csv)
 - relatório consolidado:
-  [data/processed/process_linkage_settlement_report.json](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/processed/process_linkage_settlement_report.json)
+  [data/processed/process_linkage_settlement_report.json](data/processed/process_linkage_settlement_report.json)
 - modelo persistido:
-  [artifacts/graph_settlement_model.joblib](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/artifacts/graph_settlement_model.joblib)
+  [artifacts/graph_settlement_model.joblib](artifacts/graph_settlement_model.joblib)
 - dockets no estilo CourtListener:
-  [data/raw/dockets.csv](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/raw/dockets.csv)
+  [data/raw/dockets.csv](data/raw/dockets.csv)
 - parties:
-  [data/raw/parties.csv](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/raw/parties.csv)
+  [data/raw/parties.csv](data/raw/parties.csv)
 - attorneys:
-  [data/raw/attorneys.csv](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/raw/attorneys.csv)
+  [data/raw/attorneys.csv](data/raw/attorneys.csv)
 - judges:
-  [data/raw/judges.csv](/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/raw/judges.csv)
+  [data/raw/judges.csv](data/raw/judges.csv)
 
 ### Contrato do relatório final
 

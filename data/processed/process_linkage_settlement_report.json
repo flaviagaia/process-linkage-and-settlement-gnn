@@ -8,8 +8,8 @@
   "accuracy": 0.75,
   "macro_f1": 0.7333,
   "roc_auc": 0.75,
-  "feature_artifact": "/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/processed/process_feature_table.csv",
-  "decision_artifact": "/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/processed/settlement_support.csv",
-  "model_artifact": "/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/artifacts/graph_settlement_model.joblib",
-  "report_artifact": "/Users/flaviagaia/Documents/CV_FLAVIA_CODEX/process-linkage-and-settlement-gnn/data/processed/process_linkage_settlement_report.json"
+  "feature_artifact": "data/processed/process_feature_table.csv",
+  "decision_artifact": "data/processed/settlement_support.csv",
+  "model_artifact": "artifacts/graph_settlement_model.joblib",
+  "report_artifact": "data/processed/process_linkage_settlement_report.json"
 }
